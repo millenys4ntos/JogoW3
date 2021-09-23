@@ -23,8 +23,8 @@ var obstaculo;
 
 function inicioJogo(){
   areaJogo.start();
-  personagemObj = new componente("#F00", 10, 100, 30, 30);
-  obstaculo = new componente('green', 150, 80, 120, 10);
+  personagemObj = new componente("#F00",10,100,30,30);
+  obstaculo = new componente('green',150,80,120,10);
 }
 
 let areaJogo = {
@@ -33,10 +33,13 @@ let areaJogo = {
     this.canvas.height = 300,
     this.context = this.canvas.getContext("2d");
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-    this.intervalo = setInterval(atualizaAreaJogo,20);
+    this.intervalo = setInterval(atualizaAreaJogo,  20);
   },
   limpar: function(){
-    this.context.clearReact(0, 0, this.canvas.width, this.canvas.height);
+    this.context.clearReact(0,0, this.canvas.width, this.canvas.height);
+  },
+  parar: function(){
+    clearInterval(this.interval); 
   }
 }
 
@@ -56,18 +59,41 @@ function componente(cor, x, y, largura, altura){
     this.x += this.velocidadeX;
     this.y += this.velocidadeY;
   },
-  this.bater = function(){
+  this.bater = function(obj){
     //posicao do personagem
-    
+    let esquerda  = this.x;
+    let direita = this.x + this.largura;
+    let superior = this.y;
+    let inferior = this.y + this.altura;
+
+    //posicao do obstaculo
+    let objEsquerda  = obj.x;
+    let objDireita = obj.x + obj.altura;
+    let objSuperior = obj.y;
+    let objInferior = obj.y + obj.largura;
+
+    let batida = true;
+
+    if(
+      (inferior < objSuperior) || (superior > objInferior) ||
+      (direita < objEsquerda) || (esquerda > objDireita)
+    ){
+      batida = false;
+    }
+    return batida;
   }
  
 }
 
 function atualizaAreaJogo(){
-  areaJogo.limpar();
-  obstaculo.atualiza();
-  personagemObj.novaPosicao();
-  personagemObj.atualiza();
+  if(personagemObj.bater(obstaculo)){
+    areaJogo.parar();
+  }else{
+    areaJogo.limpar();
+    obstaculo.atualiza();
+    personagemObj.novaPosicao();
+    personagemObj.atualiza();
+  }
 }
 
 function subir(){
